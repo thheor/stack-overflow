@@ -16,43 +16,6 @@
     - Filter **Verified** membantu pengguna menemukan solusi yang sudah pasti benar (diterima oleh penanya).
     - Sorting **Vote (ASC/DESC)** memungkinkan pengguna melihat solusi yang paling populer (banyak upvote) di posisi teratas.
 
-4.  **Alur Verifikasi:**
-    - Meskipun tidak disebutkan secara eksplisit di inputmu, biasanya hanya pemilik pertanyaan (Member) yang bisa mengubah status jawaban menjadi "Verified". Kamu bisa menambahkan logika ini di dalam **[Question Detail View]** jika user yang melihat adalah pemilik pertanyaan tersebut.
-
-## Classes
-
-1. Question
-
-- Title, description, view/vote count, status.
-
-2. Answer
-
-- Text, view count, vote/flag, accepted?
-
-3. Comment
-
-- Text, view/vote counts, on Q or A.
-
-4. Tag
-
-- Name, description for question.
-
-5. Member
-
-- Account, reputation, questions.
-
-## Flow of Activity
-
-### Post a question
-
-1. Masukkan title (judul pertanyaan) dan body (deskripsi masalahnya)
-2. Tambah tags (wajib diisi, minimal 1 maks 5)
-
-### Post an answer
-
-1. Pilih question
-2. Tulis answer
-
 ## Menu
 
 1. Show profile
@@ -63,7 +26,8 @@
 
 ## Penjelasan Tiap Menu
 
-root/
+```text
+menu/
 ├── 👤 1. Show Profile
 │ ├── 🔒 If Guest (Not Logged In)
 │ │ ├── 📝 Register (Daftar menjadi Member)
@@ -112,3 +76,4 @@ root/
 │ └── ✅ Submit Question
 │
 └── 🚪 5. Exit (Keluar Aplikasi)
+```
