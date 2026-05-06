@@ -1,12 +1,35 @@
 #include <iostream>
 using namespace std;
 
-int indexQ = 0;
-int indexA = 0;
-int indexC = 0;
-const int constraint = 100;
+template <typename T> struct Array {
+  int length;
+  int capacity;
+  T *data;
 
-enum QorA { QUESTION, ANSWER };
+  Array(int capacity = 2)
+      : length(0), capacity(capacity), data(new T[capacity]) {}
+
+  void insert(T &value) {
+    if (length == capacity) {
+      capacity *= 2;
+      T *newData = new T[capacity];
+
+      for (int i = 0; i < length; i++) {
+        newData[i] = data[i];
+      }
+
+      delete[] data;
+      data = newData;
+    }
+    data[length++] = value;
+  }
+
+  void print() {
+    for (int i = 0; i < length; i++) {
+      cout << data[i] << "\n";
+    }
+  }
+};
 
 struct Badges {
   string curious = "🐱";
@@ -15,109 +38,230 @@ struct Badges {
   string supporter = "🫴";
 };
 
-struct Question {
-  string title;
-  string body;
-  int view;
-  int vote;
-  string tags[5];
-  bool status;
-};
-
 struct Answer {
+  int id;
+  int authorId;
   string text;
-  int view;
-  int vote;
-  bool isAccepted;
+  int view = 0;
+  int vote = 0;
+  bool isAccepted = false;
 };
 
 struct Comment {
+  int id;
+  int authorId;
   string text;
-  int vote;
-  QorA status;
+  int vote = 0;
 };
 
-struct Tag {
-  string name;
-  string description;
+struct Question {
+  int id;
+  int authorId;
+  string title;
+  string body;
+  int view = 0;
+  int vote = 0;
+  bool isVerified = false;
+  Array<string> tags;
+  Array<Answer> answers;
+  Array<Comment> comments;
+
+  void addAnswer(string text, int userId) {
+    Answer input;
+    int id = answers.length + 1;
+    input = {id, userId, text};
+    answers.insert(input);
+
+    cout << "Answer added successfully.";
+  }
+
+  void addComment(string text, int userId) {
+    Comment input;
+    int id = comments.length + 1;
+    input = {id, userId, text};
+    comments.insert(input);
+
+    cout << "Comment created successfully.";
+  }
 };
 
 struct User {
-  string name = "test";
-  string password;
-  string email;
-  Question questions[constraint];
-  Answer answers[constraint];
-  Comment comments[constraint];
-  double reputation;
+  int id = 1;
+  string name = "Mangaras";
+  string password = "mangaras";
+  string email = "mangaras@gmail.com";
+  int reputation = 123;
+  int votes = 0;
+  Array<string> badges;
+};
 
-  void createQuestion() {
+struct App {
+  Array<User> users;
+  Array<Question> questions;
+
+  template <typename T> void assignData(T data) {}
+
+  void createUser(string name, string password, string email) {
+    int id = users.length + 1;
+    User newUser = {id, name, password, email};
+
+    users.insert(newUser);
+  }
+
+  void createQuestion(int userId) {
+    int authorId = userId;
+
+    Question input;
+    input.id = questions.length;
+    input.authorId = authorId;
+    Array<string> tags(5);
 
     cout << "Your question:\n";
     cout << "Title: ";
     cin.ignore();
-    getline(cin, questions[indexQ].title);
+    getline(cin, input.title);
     cout << "Body: ";
-    getline(cin, questions[indexQ].body);
+    getline(cin, input.body);
 
     int n;
     cout << "How many tags do you want to add? \n";
     cin >> n;
-    cout << "Add " << n << " tags (separated by space): ";
+    cout << "Add " << n << " tags: ";
+    string tag[n];
     for (int i = 0; i < n; i++) {
-      cin >> questions[indexQ].tags[i];
+      cout << "Tag #" << i << ": ";
+      cin >> tag[i];
+      cout << "\n";
+      tags.insert(tag[i]);
     }
+    input.tags = tags;
+
+    questions.insert(input);
 
     cout << "Question created successfully.";
-    indexQ++;
   }
 
-  void createAnswer() {
-    cout << "Your answer:\n";
-    cin >> answers[indexA].text;
+  template <typename T> void showQuestions(T var) {}
 
-    cout << "Answer created successfully.";
-    indexA++;
+  template <typename T> void voteUp(T &object, int userId) {
+    object.vote += 1;
+
+    cout << "Vote up successfully.";
   }
 
-  void createComment() {
-    cout << "Your comment:\n";
-    cin >> comments[indexC].text;
+  template <typename T> void voteDown(T &object, int userId) {
+    object.vote -= 1;
 
-    cout << "Comment created successfully.";
-    indexC++;
+    cout << "Vote down successfully.";
   }
 
-  void voteUpQuestion(Question question) {
-    question.vote += 1;
+  void assignBadges(int userId) {
+    User user = users.data[userId - 1];
+    int id = user.id;
+    int totalQuestions = 0;
+    int totalAnswers = 0;
+    int totalAnswersVoted = 0;
+    int totalBadges = user.badges.length;
 
-    cout << "Vote up question successfully.";
+    for (int i = 0; i < questions.length; i++) {
+      if (questions.data[i].authorId == id) {
+        totalQuestions++;
+      }
+    }
+
+    for (int i = 0; i < questions.length; i++) {
+      for (int j = 0; j < questions.data[i].answers.length; j++) {
+        if (questions.data[i].answers.data[j].authorId == id) {
+          totalQuestions++;
+        }
+      }
+    }
+
+    for (int i = 0; i < questions.length; i++) {
+      for (int j = 0; j < questions.data[i].answers.length; j++) {
+        if (questions.data[i].answers.data[j].authorId == id) {
+          totalAnswersVoted++;
+        }
+      }
+    }
+
+    Badges badges;
+
+    if (totalBadges > 4)
+      return;
+
+    if (totalQuestions >= 5) {
+      user.badges.data[user.badges.length++] = badges.curious;
+    }
+
+    if (totalAnswers >= 5) {
+      user.badges.data[user.badges.length++] = badges.guru;
+    }
+
+    if (totalAnswersVoted >= 10) {
+      user.badges.data[user.badges.length++] = badges.greatAnswer;
+    }
+
+    if (user.votes >= 10) {
+      user.badges.data[user.badges.length++] = badges.supporter;
+    }
   }
 
-  void voteDownQuestion(Question question) {
-    question.vote -= 1;
+  void assignReputation(int userId) {
+    User user = users.data[userId - 1];
+    int id = user.id;
+    int totalVoted = 0;
 
-    cout << "Vote down question successfully.";
+    for (int i = 0; i < questions.length; i++) {
+
+      if (questions.data[i].authorId == id) {
+        totalVoted++;
+      }
+
+      for (int j = 0; j < questions.data[i].answers.length; j++) {
+        if (questions.data[i].answers.data[j].authorId == id) {
+          totalVoted++;
+        }
+      }
+    }
+
+    user.reputation = 10 * totalVoted;
   }
-};
 
-struct System {
-  void assignBadges() {}
+  void showProfile(int userId) {
+    User user = users.data[userId - 1];
 
-  void assignReputation() {}
+    cout << "\n";
+    cout << "Username\t: " << user.name << "\n";
+    cout << "Email\t\t: " << user.email << "\n";
+    cout << "Reputation\t: " << user.reputation << "\n";
+    cout << "Badges\t\t: ";
+
+    int size = user.badges.length;
+    if (size == 0) {
+      cout << 0;
+    } else {
+      for (int i = 0; i < size; i++) {
+        cout << user.badges.data[i] << ", ";
+      }
+    }
+
+    cout << "\n";
+  }
 };
 
 int main() {
-  User totalUser[constraint];
-  User user = totalUser[0];
+  User user; // cuma data dummy, nanti diilangin biar ada Guest mode
+  App app;
 
   char choice;
   bool isMenu = true;
 
+  cout << "Welcome to Stack Overflow!\n";
+
   while (isMenu) {
 
-    cout << "Welcome to Stack Overflow!\n\n";
-    cout << "==== MENU ====\n";
+    cout << "\n==== MENU ====\n";
     cout << "1. Show profile\n";
     cout << "2. Show newest questions\n";
     cout << "3. Search questions\n";
@@ -128,6 +272,7 @@ int main() {
 
     switch (choice) {
     case '1': {
+      app.showProfile(user.id);
       break;
     }
     case '2': {
@@ -137,13 +282,6 @@ int main() {
       break;
     }
     case '4': {
-      user.createQuestion();
-      cout << endl;
-      cout << "BREAKDOWN\n\n";
-      cout << user.questions[0].title << endl;
-      cout << user.questions[0].body << endl;
-      for (auto tag : user.questions[0].tags)
-        cout << tag << " ";
       break;
     }
     case '0': {
@@ -151,7 +289,7 @@ int main() {
       break;
     }
     default:
-      cout << "Invalid input.";
+      cout << "Invalid input.\n";
       break;
     }
   }
