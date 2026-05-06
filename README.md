@@ -20,8 +20,6 @@
 - Filter **Verified** membantu pengguna menemukan solusi yang sudah pasti benar (diterima oleh penanya).
 - Sorting **Vote (ASC/DESC)** memungkinkan pengguna melihat solusi yang paling populer (banyak upvote) di posisi teratas.
 
-<!-- 4.  **Alur Verifikasi:** -->
-
 ## Classes
 
 1. Question
@@ -66,7 +64,7 @@
 
 ## Penjelasan Tiap Menu
 
-root/
+`root/
 ├── 👤 1. Show Profile
 │ ├── 🔒 If Guest (Not Logged In)
 │ │ ├── 📝 Register (Daftar menjadi Member)
@@ -114,7 +112,7 @@ root/
 │ ├── ⌨️ Input Tags
 │ └── ✅ Submit Question
 │
-└── 🚪 5. Exit (Keluar Aplikasi)
+└── 🚪 5. Exit (Keluar Aplikasi)`
 
 ## Cara Pake Function
 
