@@ -20,28 +20,6 @@
 - Filter **Verified** membantu pengguna menemukan solusi yang sudah pasti benar (diterima oleh penanya).
 - Sorting **Vote (ASC/DESC)** memungkinkan pengguna melihat solusi yang paling populer (banyak upvote) di posisi teratas.
 
-## Classes
-
-1. Question
-
-- Title, description, view/vote count, status.
-
-2. Answer
-
-- Text, view count, vote/flag, accepted?
-
-3. Comment
-
-- Text, view/vote counts, on Q or A.
-
-4. Tag
-
-- Name, description for question.
-
-5. Member
-
-- Account, reputation, questions.
-
 ## Flow of Activity
 
 ### Post a question
@@ -118,10 +96,19 @@ MENU/
 
 ## Cara Pake Function
 
-1. `app.showProfile(<userId>)` Untuk menampilkan profile user berdasarkan ID.
-2. `app.createUser(<nama>, <password>, <email>)` Untuk membuat user baru.
-3. `app.createQuestion(<userId>)` untuk membuat pertanyaan baru berdasarkan user ID.
-4. `app.voteUp(<struct Question/Answer>, <userId>)` untuk vote pertanyaan atau jawaban (pilih salah satu).
-5. `app.voteDown(<struct Question/Answer>, <userId>)` untuk vote down pertanyaan atau jawaban (pilih salah satu).
-6. `app.assignBadges(<userId>)` untuk memberikan badges ke user.
-7. `app.assignReputation(<userId>)` untuk memberikan reputation ke user.
+1. Menampilkan profile user berdasarkan ID.
+   ```c
+   app.showProfile(<userId>) // Menampilkan user berdasarkan user ID
+   
+   app.createUser(<nama>, <password>, <email>) // Membuat user baru
+   
+   app.createQuestion(<userId>) // Membuat pertanyaan berdasarkan user ID.
+   
+   app.voteUp(<struct Question/Answer>, <userId>) // Vote pertnyaan atau jawaban berdasarkan user ID.
+   
+   app.voteDown(<struct Question/Answer>, <userId>) // vote down pertanyaan atau jawaban berdasarkan user ID.
+   
+   app.assignBadges(<userId>) // Memberikan badges berdasarkan user ID (jenis badges ditentukan otomatis oleh function).
+   
+   app.assignReputation(<userId>) // Memberikan reputasi berdasarkan user ID.
+   ```
