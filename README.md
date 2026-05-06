@@ -64,7 +64,8 @@
 
 ## Penjelasan Tiap Menu
 
-`root/
+```text
+MENU/
 ├── 👤 1. Show Profile
 │ ├── 🔒 If Guest (Not Logged In)
 │ │ ├── 📝 Register (Daftar menjadi Member)
@@ -112,7 +113,8 @@
 │ ├── ⌨️ Input Tags
 │ └── ✅ Submit Question
 │
-└── 🚪 5. Exit (Keluar Aplikasi)`
+└── 🚪 5. Exit (Keluar Aplikasi)
+```
 
 ## Cara Pake Function
 
