@@ -126,19 +126,30 @@ struct App {
     int n;
     cout << "How many tags do you want to add? \n";
     cin >> n;
-    cout << "Add " << n << " tags: ";
+    cout << "Add " << n << " tags: \n";
     string tag[n];
     for (int i = 0; i < n; i++) {
-      cout << "Tag #" << i << ": ";
+      cout << "Tag #" << i + 1 << ": ";
       cin >> tag[i];
-      cout << "\n";
       tags.insert(tag[i]);
     }
     input.tags = tags;
 
     questions.insert(input);
 
-    cout << "Question created successfully.";
+    cout << "Question created successfully.\n";
+  }
+
+  void showAllQuestions() {
+
+    if (questions.length == 0) {
+      cout << "\nNo questions in database.\n";
+      return;
+    }
+    cout << "All Questions\n";
+    for (int i = 0; i < questions.length; i++) {
+      cout << i + 1 << ". " << questions.data[i].title << "\n";
+    }
   }
 
   template <typename T> void showQuestions(T var) {}
@@ -276,12 +287,14 @@ int main() {
       break;
     }
     case '2': {
+      app.showAllQuestions();
       break;
     }
     case '3': {
       break;
     }
     case '4': {
+      app.createQuestion(user.id);
       break;
     }
     case '0': {
