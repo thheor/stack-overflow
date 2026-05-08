@@ -66,7 +66,7 @@ struct Question {
   Array<Answer> answers;
   Array<Comment> comments;
 
-  void addAnswer(string text, int userId) {
+  void addAnswer(int userId, string text) {
     Answer input;
     int id = answers.length + 1;
     input = {id, userId, text};
@@ -75,7 +75,7 @@ struct Question {
     cout << "Answer added successfully.";
   }
 
-  void addComment(string text, int userId) {
+  void addComment(int userId, string text) {
     Comment input;
     int id = comments.length + 1;
     input = {id, userId, text};
@@ -90,7 +90,7 @@ struct User {
   string name = "Mangaras";
   string password = "mangaras";
   string email = "mangaras@gmail.com";
-  int reputation = 123;
+  int reputation = 0;
   int votes = 0;
   Array<string> badges;
 };
@@ -108,32 +108,15 @@ struct App {
     users.insert(newUser);
   }
 
-  void createQuestion(int userId) {
-    int authorId = userId;
+  void createQuestion(int userId, string title, string body,
+                      Array<string> tags) {
 
-    Question input;
-    input.id = questions.length;
-    input.authorId = authorId;
-    Array<string> tags(5);
-
-    cout << "Your question:\n";
-    cout << "Title: ";
-    cin.ignore();
-    getline(cin, input.title);
-    cout << "Body: ";
-    getline(cin, input.body);
-
-    int n;
-    cout << "How many tags do you want to add? \n";
-    cin >> n;
-    cout << "Add " << n << " tags: \n";
-    string tag[n];
-    for (int i = 0; i < n; i++) {
-      cout << "Tag #" << i + 1 << ": ";
-      cin >> tag[i];
-      tags.insert(tag[i]);
-    }
-    input.tags = tags;
+    int id = questions.length;
+    Question input = {.id = id,
+                      .authorId = userId,
+                      .title = title,
+                      .body = body,
+                      .tags = tags};
 
     questions.insert(input);
 
@@ -180,6 +163,7 @@ struct App {
       }
     }
 
+    // Nanti di ganti pake binary search ya kak
     for (int i = 0; i < questions.length; i++) {
       for (int j = 0; j < questions.data[i].answers.length; j++) {
         if (questions.data[i].answers.data[j].authorId == id) {
@@ -188,6 +172,7 @@ struct App {
       }
     }
 
+    // Nanti di ganti pake binary search ya kak
     for (int i = 0; i < questions.length; i++) {
       for (int j = 0; j < questions.data[i].answers.length; j++) {
         if (questions.data[i].answers.data[j].authorId == id) {
@@ -287,14 +272,12 @@ int main() {
       break;
     }
     case '2': {
-      app.showAllQuestions();
       break;
     }
     case '3': {
       break;
     }
     case '4': {
-      app.createQuestion(user.id);
       break;
     }
     case '0': {
