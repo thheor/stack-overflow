@@ -11,7 +11,7 @@ template <typename T> struct Array {
   Array(int capacity = 2)
       : length(0), capacity(capacity), data(new T[capacity]) {}
 
-  void insert(T &value) {
+  void insert(T value) {
     if (length == capacity) {
       capacity *= 2;
       T *newData = new T[capacity];
@@ -110,7 +110,7 @@ struct Question {
 };
 
 struct User {
-  int id = 1;
+  int id = -1;
   string name = "Mangaras";
   string password = "mangaras";
   string email = "mangaras@gmail.com";
@@ -161,13 +161,13 @@ struct App {
 
   template <typename T> void showQuestions(T var) {}
 
-  template <typename T> void voteUp(T &object, int userId) {
+  template <typename T> void voteUp(int userId, T &object) {
     object.vote += 1;
 
     cout << "Vote up successfully.";
   }
 
-  template <typename T> void voteDown(T &object, int userId) {
+  template <typename T> void voteDown(int userId, T &object) {
     object.vote -= 1;
 
     cout << "Vote down successfully.";
@@ -181,6 +181,7 @@ struct App {
     int totalAnswersVoted = 0;
     int totalBadges = user.badges.length;
 
+    // Nanti di ganti pake binary search ya kak
     for (int i = 0; i < questions.length; i++) {
       if (questions.data[i].authorId == id) {
         totalQuestions++;
@@ -211,19 +212,19 @@ struct App {
       return;
 
     if (totalQuestions >= 5) {
-      user.badges.data[user.badges.length++] = badges.curious;
+      user.badges.insert(badges.curious);
     }
 
     if (totalAnswers >= 5) {
-      user.badges.data[user.badges.length++] = badges.guru;
+      user.badges.insert(badges.guru);
     }
 
     if (totalAnswersVoted >= 10) {
-      user.badges.data[user.badges.length++] = badges.greatAnswer;
+      user.badges.insert(badges.greatAnswer);
     }
 
     if (user.votes >= 10) {
-      user.badges.data[user.badges.length++] = badges.supporter;
+      user.badges.insert(badges.supporter);
     }
   }
 
@@ -274,6 +275,12 @@ int main() {
   User user; // cuma data dummy, nanti diilangin biar ada Guest mode
   App app;
 
+  if (user.id == -1) {
+    // cout << "Anda bukan member\n";
+    // Tambahin logic kalo bukan member, misal menunya cuma bisa liat show
+    // newest question dan search question
+  }
+
   char choice;
   bool isMenu = true;
 
@@ -322,7 +329,7 @@ template <typename T> T input(string text) {
   if (typeid(n) == typeid(string)) {
     do {
       cout << text;
-      getline(cin, n);
+      getline(cin, n, "\t");
     } while (n.empty());
 
     return n;
