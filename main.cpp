@@ -1,6 +1,8 @@
 #include <iostream>
 using namespace std;
 
+template <typename T> T input(T text);
+
 template <typename T> struct Array {
   int length;
   int capacity;
@@ -23,6 +25,28 @@ template <typename T> struct Array {
     }
     data[length++] = value;
   }
+
+  void removeAt(int index) {
+    for (int i = index; i < length - 1; i++) {
+      data[i] = data[i + 1];
+    }
+
+    data[length - 1] = 0;
+    length--;
+
+    if (capacity == 2 * length && capacity > 2) {
+      capacity /= 2;
+      int *newData = new int[capacity];
+
+      for (int i = 0; i < capacity; i++) {
+        newData[i] = data[i];
+      }
+      delete[] data;
+      data = newData;
+    }
+  }
+
+  T at(int index) { return data[index]; }
 
   void print() {
     for (int i = 0; i < length; i++) {
@@ -290,4 +314,26 @@ int main() {
     }
   }
   return 0;
+}
+
+template <typename T> T input(string text) {
+  T n;
+
+  if (typeid(n) == typeid(string)) {
+    do {
+      cout << text;
+      getline(cin, n);
+    } while (n.empty());
+
+    return n;
+  }
+
+  cout << text;
+  while (!(cin >> n)) {
+    cout << "Invalid input. Try again: ";
+    cin.clear();
+    cin.ignore(10000, '\n');
+  }
+
+  return n;
 }
