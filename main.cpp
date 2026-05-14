@@ -1,12 +1,13 @@
 #include <iostream>
+#include <string>
 using namespace std;
 
-template <typename T> T input(T text);
+template <typename T> T input(string text);
 
 template <typename T> struct Array {
   int length;
   int capacity;
-  T *data;
+  T *data = nullptr;
 
   Array(int capacity = 2)
       : length(0), capacity(capacity), data(new T[capacity]) {}
@@ -27,22 +28,18 @@ template <typename T> struct Array {
   }
 
   void removeAt(int index) {
+    T *newData = new T[capacity];
     for (int i = index; i < length - 1; i++) {
-      data[i] = data[i + 1];
+      newData[i] = data[i + 1];
     }
 
-    data[length - 1] = 0;
     length--;
+
+    delete[] data;
+    data = newData;
 
     if (capacity == 2 * length && capacity > 2) {
       capacity /= 2;
-      int *newData = new int[capacity];
-
-      for (int i = 0; i < capacity; i++) {
-        newData[i] = data[i];
-      }
-      delete[] data;
-      data = newData;
     }
   }
 
@@ -55,11 +52,87 @@ template <typename T> struct Array {
   }
 };
 
-struct Badges {
-  string curious = "🐱";
-  string guru = "🎎";
-  string greatAnswer = "🏅";
-  string supporter = "🫴";
+class CSV {
+private:
+  string *ptr = nullptr;
+  Array<Array<string>> csv;
+  string filePath;
+
+public:
+  CSV(string path) : filePath(path) {}
+
+  void parse() {
+    FILE *fptr;
+    fptr = fopen(filePath.c_str(), "r");
+
+    if (fptr == NULL) {
+      perror("Error opening file:");
+      return;
+    }
+
+    char buffer[500];
+
+    string temp = "";
+    while (fgets(buffer, 500, fptr)) {
+      Array<string> *arrP = new Array<string>;
+      bool isPush = false;
+
+      for (int i = 0; buffer[i] != '\0' && buffer[i] != '\n'; i++) {
+        if (buffer[i] == ',') {
+          arrP->insert(temp);
+          temp = "";
+          isPush = true;
+        } else {
+          if (!isPush) {
+            temp += buffer[i];
+          }
+          isPush = false;
+        }
+      }
+
+      csv.insert(*arrP);
+      delete arrP;
+    }
+
+    fclose(fptr);
+  }
+
+  void read() {
+    if (csv.length == 0) {
+      cout << "There is no data in the CSV or you haven't parsed it yet.\n";
+      return;
+    }
+
+    for (int i = 0; i < csv.length; i++) {
+      cout << "row ke-" << i << endl;
+      for (int j = 0; j < csv.data->length; j++) {
+        cout << csv.data[i].data[j] << endl;
+      }
+    }
+  }
+
+  Array<string> get(string field) {
+    int index;
+    Array<string> arr;
+
+    for (int i = 0; i < csv.data->length; i++) {
+      if (csv.data[0].data[i] == field) {
+        index = i;
+      }
+    }
+
+    for (int i = 1; i < csv.length; i++) {
+      arr.insert(csv.data[i].data[index]);
+    }
+
+    return arr;
+  }
+
+  int length(string field = "all") {
+    if (field != "all")
+      return csv.length - 1;
+    return csv.length;
+  }
 };
 
 struct Answer {
@@ -83,40 +156,41 @@ struct Question {
   int authorId;
   string title;
   string body;
-  int view = 0;
   int vote = 0;
   bool isVerified = false;
-  Array<string> tags;
   Array<Answer> answers;
   Array<Comment> comments;
 
-  void addAnswer(int userId, string text) {
+  void addAnswer(int userId, string text, bool init = true) {
     Answer input;
     int id = answers.length + 1;
     input = {id, userId, text};
     answers.insert(input);
 
+    if (init)
+      return;
     cout << "Answer added successfully.";
   }
 
-  void addComment(int userId, string text) {
+  void addComment(int userId, string text, bool init = true) {
     Comment input;
     int id = comments.length + 1;
     input = {id, userId, text};
     comments.insert(input);
 
+    if (init)
+      return;
     cout << "Comment created successfully.";
   }
 };
 
 struct User {
-  int id = -1;
-  string name = "Mangaras";
-  string password = "mangaras";
-  string email = "mangaras@gmail.com";
+  int id;
+  string name;
+  string password;
+  string email;
   int reputation = 0;
   int votes = 0;
-  Array<string> badges;
 };
 
 struct App {
@@ -133,18 +207,21 @@ struct App {
   }
 
   void createQuestion(int userId, string title, string body,
-                      Array<string> tags) {
+                      bool isInit = false) {
 
     int id = questions.length;
-    Question input = {.id = id,
-                      .authorId = userId,
-                      .title = title,
-                      .body = body,
-                      .tags = tags};
+    Question input = {
+        .id = id,
+        .authorId = userId,
+        .title = title,
+        .body = body,
+    };
 
     questions.insert(input);
 
-    cout << "Question created successfully.\n";
+    if (!isInit) {
+      cout << "Question created successfully.\n";
+    }
   }
 
   void showAllQuestions() {
@@ -153,13 +230,11 @@ struct App {
       cout << "\nNo questions in database.\n";
       return;
     }
-    cout << "All Questions\n";
+    cout << "\nAll Questions\n";
     for (int i = 0; i < questions.length; i++) {
       cout << i + 1 << ". " << questions.data[i].title << "\n";
     }
   }
-
-  template <typename T> void showQuestions(T var) {}
 
   template <typename T> void voteUp(int userId, T &object) {
     object.vote += 1;
@@ -173,63 +248,8 @@ struct App {
     cout << "Vote down successfully.";
   }
 
-  void assignBadges(int userId) {
-    User user = users.data[userId - 1];
-    int id = user.id;
-    int totalQuestions = 0;
-    int totalAnswers = 0;
-    int totalAnswersVoted = 0;
-    int totalBadges = user.badges.length;
-
-    // Nanti di ganti pake binary search ya kak
-    for (int i = 0; i < questions.length; i++) {
-      if (questions.data[i].authorId == id) {
-        totalQuestions++;
-      }
-    }
-
-    // Nanti di ganti pake binary search ya kak
-    for (int i = 0; i < questions.length; i++) {
-      for (int j = 0; j < questions.data[i].answers.length; j++) {
-        if (questions.data[i].answers.data[j].authorId == id) {
-          totalQuestions++;
-        }
-      }
-    }
-
-    // Nanti di ganti pake binary search ya kak
-    for (int i = 0; i < questions.length; i++) {
-      for (int j = 0; j < questions.data[i].answers.length; j++) {
-        if (questions.data[i].answers.data[j].authorId == id) {
-          totalAnswersVoted++;
-        }
-      }
-    }
-
-    Badges badges;
-
-    if (totalBadges > 4)
-      return;
-
-    if (totalQuestions >= 5) {
-      user.badges.insert(badges.curious);
-    }
-
-    if (totalAnswers >= 5) {
-      user.badges.insert(badges.guru);
-    }
-
-    if (totalAnswersVoted >= 10) {
-      user.badges.insert(badges.greatAnswer);
-    }
-
-    if (user.votes >= 10) {
-      user.badges.insert(badges.supporter);
-    }
-  }
-
   void assignReputation(int userId) {
-    User user = users.data[userId - 1];
+    User &user = users.data[userId - 1];
     int id = user.id;
     int totalVoted = 0;
 
@@ -256,30 +276,94 @@ struct App {
     cout << "Username\t: " << user.name << "\n";
     cout << "Email\t\t: " << user.email << "\n";
     cout << "Reputation\t: " << user.reputation << "\n";
-    cout << "Badges\t\t: ";
+  }
 
-    int size = user.badges.length;
-    if (size == 0) {
-      cout << 0;
-    } else {
-      for (int i = 0; i < size; i++) {
-        cout << user.badges.data[i] << ", ";
-      }
+  void userInit(string path) {
+    CSV csv(path);
+
+    csv.parse();
+
+    Array<string> names = csv.get("name");
+    Array<string> passwords = csv.get("password");
+    Array<string> emails = csv.get("email");
+    Array<string> reputations = csv.get("reputation");
+
+    int length = csv.length("yang penting bukan all");
+
+    for (int i = 0; i < length; i++) {
+      createUser(names.at(i), passwords.at(i), emails.at(i));
+      users.data[i].reputation = stoi(reputations.at(i));
     }
+  }
 
-    cout << "\n";
+private:
+  void questionInit(string path) {
+    CSV csv(path);
+
+    csv.parse();
+
+    Array<string> userIds = csv.get("authorId");
+    Array<string> titles = csv.get("title");
+    Array<string> bodies = csv.get("body");
+    Array<string> votes = csv.get("vote");
+    Array<string> isVerifieds = csv.get("isVerified");
+
+    int length = csv.length("yang penting bukan all");
+
+    for (int i = 0; i < length; i++) {
+      createQuestion(stoi(userIds.at(i)), titles.at(i), bodies.at(i), true);
+      questions.data[i].vote = stoi(votes.at(i));
+      questions.data[i].isVerified = stoi(isVerifieds.at(i));
+    }
+  }
+
+  void answerInit(string path) {
+    CSV csv(path);
+    csv.parse();
+
+    Array<string> authorIds = csv.get("authorId");
+    Array<string> texts = csv.get("text");
+    Array<string> votes = csv.get("vote");
+    Array<string> isAccepteds = csv.get("isAccepted");
+
+    int length = csv.length("yang penting bukan all");
+
+    for (int i = 0; i < length; i++) {
+      questions.data[i].addAnswer(stoi(authorIds.at(i)), texts.at(i));
+      questions.data[i].answers.data[i].vote = stoi(votes.at(i));
+      questions.data[i].answers.data[i].isAccepted = stoi(votes.at(i));
+    }
+  }
+
+  void commentInit(string path) {
+    CSV csv(path);
+    csv.parse();
+
+    Array<string> authorIds = csv.get("authorId");
+    Array<string> texts = csv.get("text");
+    Array<string> votes = csv.get("vote");
+
+    int length = csv.length("yang penting bukan all");
+
+    for (int i = 0; i < length; i++) {
+      questions.data[i].addComment(stoi(authorIds.at(i)), texts.at(i));
+      questions.data[i].comments.data[i].vote = stoi(votes.at(i));
+    }
+  }
+
+public:
+  void init() {
+    userInit("./data/users.csv");
+    questionInit("./data/questions.csv");
+    answerInit("./data/answers.csv");
+    commentInit("./data/comments.csv");
   }
 };
 
 int main() {
   User user; // cuma data dummy, nanti diilangin biar ada Guest mode
   App app;
-
-  if (user.id == -1) {
-    // cout << "Anda bukan member\n";
-    // Tambahin logic kalo bukan member, misal menunya cuma bisa liat show
-    // newest question dan search question
-  }
+  app.init();
 
   char choice;
   bool isMenu = true;
@@ -299,10 +383,22 @@ int main() {
 
     switch (choice) {
     case '1': {
+      user.id = 1;
+      app.showProfile(user.id);
+      user.id = 2;
+      app.showProfile(user.id);
+      user.id = 3;
+      app.showProfile(user.id);
+      user.id = 4;
+      app.showProfile(user.id);
+      user.id = 5;
+      app.showProfile(user.id);
+      user.id = 6;
       app.showProfile(user.id);
       break;
     }
     case '2': {
+      app.showAllQuestions();
       break;
     }
     case '3': {
@@ -329,7 +425,7 @@ template <typename T> T input(string text) {
   if (typeid(n) == typeid(string)) {
     do {
       cout << text;
-      getline(cin, n, "\t");
+      getline(cin, n);
     } while (n.empty());
 
     return n;
