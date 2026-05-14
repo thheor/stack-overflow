@@ -1,7 +1,7 @@
 # Stack Overflow
 
 ## Penjelasan Logika Fitur
-coba
+
 1. **Guest vs Member :**
 
 - User yang belum login dianggap sebagai **Guest** dan yang sudah login dianggap sebagai **Member**.
@@ -22,8 +22,9 @@ coba
 
 ### Menu untuk Guest
 
-1. Show newest questions
-2. Search questions
+1. Login or register
+2. Show newest questions
+3. Search questions
 
 ### Menu untuk Member
 
@@ -63,8 +64,6 @@ MENU/
 ├── 🔍 3. Search Questions
 │ ├── ⌨️ Enter Keyword
 │ ├── ⚙️ Set Filters (Optional)
-│ │ ├── 🔢 Min Votes Count (e.g., > 10)
-│ │ ├── ❓ Answer Status (All / Answered / Unanswered)
 │ │ └── ✅ Verification Status (Verified / Not Verified)
 │ ├── 📑 Set Sorting
 │ │ ├── ⬆️ Vote (ASC)
@@ -89,7 +88,7 @@ MENU/
 
 ## Cara Pake Function dan Struct
 
-Untuk setiap input jangan pake `cin << input` ya ges, tapi pake ini
+Untuk setiap input jangan pake `cin << input` (kecuali tipe data char) ya ges, tapi pake ini
 
 > [!NOTE]
 > untuk input string, bisa pake enter, untuk berhentiinnya pake tab
@@ -98,11 +97,8 @@ Untuk setiap input jangan pake `cin << input` ya ges, tapi pake ini
 nama-variable = <tipe-data>input(string text)
 
 // contoh
-int umur = <string>input("masukkan umur: ");
-string text = <string>input("masukkan text: "); // untuk string bisa input enter
-// misal, input = "UPN
-// Veteran
-// Jogja" untuk berhentiinnya pake tab lalu enter.
+int umur = <int>input("masukkan umur: ");
+string text = <string>input("masukkan text: ");
 ```
 
 ```c
@@ -126,8 +122,6 @@ app.createQuestion(int userId, string title, string body, Array<string> tags) //
 app.voteUp(<struct Question/Answer>, <userId>) // Vote pertnyaan atau jawaban berdasarkan user ID.
 
 app.voteDown(<struct Question/Answer>, <userId>) // vote down pertanyaan atau jawaban berdasarkan user ID.
-
-app.assignBadges(<userId>) // Memberikan badges berdasarkan user ID (jenis badges ditentukan otomatis oleh function).
 
 app.assignReputation(<userId>) // Memberikan reputasi berdasarkan user ID.
 
