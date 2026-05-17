@@ -107,6 +107,10 @@ app.createUser(<nama>, <password>, <email>) // Membuat user baru
 
 app.createQuestion(int userId, string title, string body, Array<string> tags) // Membuat pertanyaan berdasarkan user ID.
 
+app.showAnswer(int questionId) //tampilin answer berdasarkan question id
+
+app.showComment(int questionId) //tampilin comment berdasarkan question id
+
 app.voteUp(<struct Question/Answer>, <userId>) // Vote pertnyaan atau jawaban berdasarkan user ID.
 
 app.voteDown(<struct Question/Answer>, <userId>) // vote down pertanyaan atau jawaban berdasarkan user ID.
