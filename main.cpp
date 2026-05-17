@@ -4,6 +4,8 @@ using namespace std;
 
 template <typename T> T input(string text);
 
+template <> string input<string>(string text);
+
 template <typename T> struct Array {
   int length;
   int capacity;
@@ -139,7 +141,6 @@ struct Answer {
   int id;
   int authorId;
   string text;
-  int view = 0;
   int vote = 0;
   bool isAccepted = false;
 };
@@ -190,14 +191,11 @@ struct User {
   string password;
   string email;
   int reputation = 0;
-  int votes = 0;
 };
 
 struct App {
   Array<User> users;
   Array<Question> questions;
-
-  template <typename T> void assignData(T data) {}
 
   void createUser(string name, string password, string email) {
     int id = users.length + 1;
@@ -248,6 +246,32 @@ struct App {
     cout << "Vote down successfully.";
   }
 
+  void showAnswer(int questionId) {
+    Question &question = questions.data[questionId - 1];
+    cout << "\n--- Question ---\n";
+    cout << question.title << endl;
+    cout << "\n--- Answer ---\n";
+
+    for (int i = 0; i < question.answers.length; i++) {
+      if (questions.data[questionId - 1].answers.data[i].isAccepted) {
+        cout << "Status: Verified\n";
+      }
+      int authorId = questions.data[questionId - 1].answers.at(i).authorId;
+      cout << "Username: " << users.at(authorId - 1).name << endl;
+      cout << "Answer: " << question.answers.data[i].text << endl;
+    }
+  }
+
+  void showComment(int questionId) {
+    Question &question = questions.data[questionId - 1];
+
+    cout << "\n--- Comment ---\n";
+    for (int i = 0; i < question.comments.length; i++) {
+      cout << questions.data[questionId - 1].comments.at(i).text << endl;
+    }
+    cout << "\n";
+  }
+
   void assignReputation(int userId) {
     User &user = users.data[userId - 1];
     int id = user.id;
@@ -271,11 +295,41 @@ struct App {
 
   void showProfile(int userId) {
     User user = users.data[userId - 1];
+    Array<Question> q;
+    Array<Answer> a;
+
+    for (int i = 0; i < questions.length; i++) {
+      for (int j = 0; j < questions.data[i].answers.length; j++) {
+        if (questions.data[i].answers.data[j].authorId == userId) {
+          a.insert(questions.data[i].answers.data[j]);
+        }
+      }
+    }
+
+    for (int i = 0; i < questions.length; i++) {
+      if (questions.data[i].authorId == userId) {
+        q.insert(questions.data[i]);
+      }
+    }
 
     cout << "\n";
     cout << "Username\t: " << user.name << "\n";
     cout << "Email\t\t: " << user.email << "\n";
     cout << "Reputation\t: " << user.reputation << "\n";
+
+    if (q.length > 0) {
+      cout << "--- Questions List ---\n";
+      for (int i = 0; i < q.length; i++) {
+        cout << "#" << i + 1 << " " << q.at(i).title << "\n";
+      }
+    }
+
+    if (a.length > 0) {
+      cout << "--- Answer List ---\n";
+      for (int i = 0; i < a.length; i++) {
+        cout << "#" << i + 1 << " " << a.at(i).text << "\n";
+      }
+    }
   }
 
   void userInit(string path) {
@@ -329,9 +383,10 @@ private:
     int length = csv.length("yang penting bukan all");
 
     for (int i = 0; i < length; i++) {
-      questions.data[i].addAnswer(stoi(authorIds.at(i)), texts.at(i));
-      questions.data[i].answers.data[i].vote = stoi(votes.at(i));
-      questions.data[i].answers.data[i].isAccepted = stoi(votes.at(i));
+      const bool isAccepted = stoi(isAccepteds.at(i));
+      Answer answer = {i + 1, stoi(authorIds.at(i)), texts.at(i),
+                       stoi(votes.at(i)), isAccepted};
+      questions.data[i].answers.insert(answer);
     }
   }
 
@@ -361,7 +416,6 @@ public:
 };
 
 int main() {
-  User user; // cuma data dummy, nanti diilangin biar ada Guest mode
   App app;
   app.init();
 
@@ -383,22 +437,9 @@ int main() {
 
     switch (choice) {
     case '1': {
-      user.id = 1;
-      app.showProfile(user.id);
-      user.id = 2;
-      app.showProfile(user.id);
-      user.id = 3;
-      app.showProfile(user.id);
-      user.id = 4;
-      app.showProfile(user.id);
-      user.id = 5;
-      app.showProfile(user.id);
-      user.id = 6;
-      app.showProfile(user.id);
       break;
     }
     case '2': {
-      app.showAllQuestions();
       break;
     }
     case '3': {
@@ -419,17 +460,19 @@ int main() {
   return 0;
 }
 
+template <> string input<string>(string text) {
+  string n;
+
+  do {
+    cout << text;
+    getline(cin >> ws, n);
+  } while (n.empty());
+
+  return n;
+}
+
 template <typename T> T input(string text) {
   T n;
-
-  if (typeid(n) == typeid(string)) {
-    do {
-      cout << text;
-      getline(cin, n);
-    } while (n.empty());
-
-    return n;
-  }
 
   cout << text;
   while (!(cin >> n)) {
