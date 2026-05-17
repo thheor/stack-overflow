@@ -20,14 +20,6 @@
 
 ## Menu
 
-### Menu untuk Guest
-
-1. Login or register
-2. Show newest questions
-3. Search questions
-
-### Menu untuk Member
-
 1. Show profile
 2. Show newest questions
 3. Search questions
@@ -44,14 +36,14 @@ MENU/
 │ │ ├── 🔑 Login
 │ │ └── 🔙 Back to Main Menu
 │ └── 🔓 If Member (Logged In)
-│ ├── 📊 View Stats (Username, Reputasi, Badge)
+│ ├── 📊 View Stats (Username, Reputasi)
 │ ├── 📚 My Questions (List pertanyaan sendiri)
 │ ├── 📜 My Answers (List jawaban sendiri)
 │ └── 🔙 Back to Main Menu
 │
 ├── 🆕 2. Show Newest Questions
 │ ├── 📄 List: [Title] | [Votes] | [Answers] | [Is Verified?]
-│ └── 🔍 Select Question (ID)
+│ └── 🔍 Select Question (No)
 │ └── 📖 [Question Detail View]
 │ ├── 💬 View Comments
 │ ├── 💡 View Answers (List jawaban + Status Verifikasi)
@@ -62,9 +54,6 @@ MENU/
 │ └── 🗳️ Vote Answer (Up/Down)
 │
 ├── 🔍 3. Search Questions
-│ ├── ⌨️ Enter Keyword
-│ ├── ⚙️ Set Filters (Optional)
-│ │ └── ✅ Verification Status (Verified / Not Verified)
 │ ├── 📑 Set Sorting
 │ │ ├── ⬆️ Vote (ASC)
 │ │ └── ⬇️ Vote (DESC)
@@ -80,7 +69,6 @@ MENU/
 │ └── 🔓 If Member
 │ ├── ⌨️ Input Title
 │ ├── ⌨️ Input Content/Body
-│ ├── ⌨️ Input Tags
 │ └── ✅ Submit Question
 │
 └── 🚪 5. Exit (Keluar Aplikasi)
