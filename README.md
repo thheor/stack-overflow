@@ -85,8 +85,8 @@ Untuk setiap input jangan pake `cin << input` (kecuali tipe data char) ya ges, t
 nama-variable = <tipe-data>input(string text)
 
 // contoh
-int umur = <int>input("masukkan umur: ");
-string text = <string>input("masukkan text: ");
+int umur = input<int>("masukkan umur: ");
+string text = input<string>("masukkan text: ");
 ```
 
 ```c
