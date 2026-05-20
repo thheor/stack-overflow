@@ -418,6 +418,9 @@ public:
 int main() {
   App app;
   app.init();
+  bool isLogin = false;
+  int currentUserId = -1;
+  
 
   char choice;
   bool isMenu = true;
@@ -437,8 +440,76 @@ int main() {
 
     switch (choice) {
     case '1': {
-      break;
-    }
+
+		if (!isLogin) {
+
+		char profileChoice;
+
+		cout << "\n=== ACCOUNT MENU ===\n";
+		cout << "1. Register\n";
+		cout << "2. Login\n";
+		cout << "0. Back\n";
+		cout << "Choose: ";
+		cin >> profileChoice;
+
+		switch (profileChoice) {
+
+			case '1': {
+
+			  string name = input<string>("Input username : ");
+			  string password = input<string>("Input password : ");
+			  string email = input<string>("Input email    : ");
+
+			  app.createUser(name, password, email);
+
+			  cout << "Register success.\n";
+
+			  break;
+			}
+
+			case '2': {
+
+			  string email = input<string>("Input email    : ");
+			  string password = input<string>("Input password : ");
+
+			  bool found = false;
+
+			  for (int i = 0; i < app.users.length; i++) {
+
+				if (app.users.data[i].email == email &&
+					app.users.data[i].password == password) {
+
+				  isLogin = true;
+				  currentUserId = app.users.data[i].id;
+
+				  found = true;
+
+				  cout << "Login success.\n";
+				  break;
+				}
+			  }
+
+			if (!found) {
+				cout << "Login failed.\n";
+				}
+			break;
+			}
+
+			case '0':
+			break;
+
+			default:
+			cout << "Invalid input.\n";
+			}
+
+		} else {
+			app.assignReputation(currentUserId);
+			app.showProfile(currentUserId);
+		  }
+
+		  break;
+			  break;
+			}
     case '2': {
       break;
     }
@@ -446,6 +517,16 @@ int main() {
       break;
     }
     case '4': {
+		
+		if (!isLogin) {
+			cout << "Please login first.\n";
+			break;
+		}
+		
+	  string title = input<string>("Input title : ");
+	  string body = input<string>("Input body  : ");
+
+	  app.createQuestion(currentUserId, title, body);
       break;
     }
     case '0': {
