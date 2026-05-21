@@ -315,21 +315,7 @@ struct App {
     cout << "\n";
     cout << "Username\t: " << user.name << "\n";
     cout << "Email\t\t: " << user.email << "\n";
-    cout << "Reputation\t: " << user.reputation << "\n";
-
-    if (q.length > 0) {
-      cout << "--- Questions List ---\n";
-      for (int i = 0; i < q.length; i++) {
-        cout << "#" << i + 1 << " " << q.at(i).title << "\n";
-      }
-    }
-
-    if (a.length > 0) {
-      cout << "--- Answer List ---\n";
-      for (int i = 0; i < a.length; i++) {
-        cout << "#" << i + 1 << " " << a.at(i).text << "\n";
-      }
-    }
+    cout << "Reputation\t: " << user.reputation << " point" << "\n";
   }
 
   void userInit(string path) {
@@ -420,7 +406,6 @@ int main() {
   app.init();
   bool isLogin = false;
   int currentUserId = -1;
-  
 
   char choice;
   bool isMenu = true;
@@ -441,75 +426,139 @@ int main() {
     switch (choice) {
     case '1': {
 
-		if (!isLogin) {
+      if (!isLogin) {
 
-		char profileChoice;
+        char profileChoice;
 
-		cout << "\n=== ACCOUNT MENU ===\n";
-		cout << "1. Register\n";
-		cout << "2. Login\n";
-		cout << "0. Back\n";
-		cout << "Choose: ";
-		cin >> profileChoice;
+        cout << "\n=== ACCOUNT MENU ===\n";
+        cout << "1. Register\n";
+        cout << "2. Login\n";
+        cout << "0. Back\n";
+        cout << "Choose: ";
+        cin >> profileChoice;
 
-		switch (profileChoice) {
+        switch (profileChoice) {
 
-			case '1': {
+        case '1': {
 
-			  string name = input<string>("Input username : ");
-			  string password = input<string>("Input password : ");
-			  string email = input<string>("Input email    : ");
+          string name = input<string>("Input username : ");
+          string password = input<string>("Input password : ");
+          string email = input<string>("Input email    : ");
 
-			  app.createUser(name, password, email);
+          app.createUser(name, password, email);
+          currentUserId = app.users.data[app.users.length - 1].id;
+          isLogin = true;
 
-			  cout << "Register success.\n";
+          cout << "Register success.\n";
 
-			  break;
-			}
+          break;
+        }
 
-			case '2': {
+        case '2': {
 
-			  string email = input<string>("Input email    : ");
-			  string password = input<string>("Input password : ");
+          string email = input<string>("Input email    : ");
+          string password = input<string>("Input password : ");
 
-			  bool found = false;
+          bool found = false;
 
-			  for (int i = 0; i < app.users.length; i++) {
+          for (int i = 0; i < app.users.length; i++) {
 
-				if (app.users.data[i].email == email &&
-					app.users.data[i].password == password) {
+            if (app.users.data[i].email == email &&
+                app.users.data[i].password == password) {
 
-				  isLogin = true;
-				  currentUserId = app.users.data[i].id;
+              isLogin = true;
+              currentUserId = app.users.data[i].id;
 
-				  found = true;
+              found = true;
 
-				  cout << "Login success.\n";
-				  break;
-				}
-			  }
+              cout << "Login success.\n";
+              continue;
+            }
+          }
 
-			if (!found) {
-				cout << "Login failed.\n";
-				}
-			break;
-			}
+          if (!found) {
+            cout << "Login failed.\n";
+          }
+          break;
+        }
 
-			case '0':
-			break;
+        case '0':
+          break;
 
-			default:
-			cout << "Invalid input.\n";
-			}
+        default:
+          cout << "Invalid input.\n";
+        }
+        // Fia mulai edit di bawah sini
+      } else {
+        char memberChoice;
+        do {
+          cout << "\n===	PROFILE MENU	===\n";
+          cout << "1. View Stats\n";
+          cout << "2. My Questions\n";
+          cout << "3. My Answers\n";
+          cout << "0. Back\n";
+          cout << "Choose	: ";
+          cin >> memberChoice;
 
-		} else {
-			app.assignReputation(currentUserId);
-			app.showProfile(currentUserId);
-		  }
+          switch (memberChoice) {
+          case '1': {
+            app.assignReputation(currentUserId);
+            app.showProfile(currentUserId);
+            break;
+          }
 
-		  break;
-			  break;
-			}
+          case '2': {
+            bool isFound = false;
+            cout << "\n===	 MY QUESTIONS	===\n";
+            for (int i = 0; i < app.questions.length; i++) {
+              if (app.questions.data[i].authorId == currentUserId) {
+                isFound = true;
+                cout << i + 1 << ". " << app.questions.data[i].title << "\n";
+              }
+            }
+            if (!isFound) {
+              cout << "You have no questions yet.\n";
+            }
+
+            break;
+          }
+
+          case '3': {
+            bool isFound = false;
+            cout << "\n===	MY ANSWERS	===\n";
+            for (int i = 0; i < app.questions.length; i++) {
+              for (int j = 0; j < app.questions.data[i].answers.length; j++) {
+                if (app.questions.data[i].answers.data[j].authorId ==
+                    currentUserId) {
+                  isFound = true;
+                  cout << "Question	: " << app.questions.data[i].title
+                       << "\n";
+                  cout << "Answer		: "
+                       << app.questions.data[i].answers.data[j].text << "\n\n";
+                }
+              }
+            }
+            if (!isFound) {
+              cout << "You have no answers yet.\n";
+            }
+            break;
+          }
+
+          case '0': {
+            break;
+          }
+
+          default: {
+            cout << "Invalid input.\n";
+          }
+          }
+        } while (memberChoice != '0');
+      }
+      break;
+    }
+
+      // Fia smpe sini
+
     case '2': {
       break;
     }
@@ -517,16 +566,16 @@ int main() {
       break;
     }
     case '4': {
-		
-		if (!isLogin) {
-			cout << "Please login first.\n";
-			break;
-		}
-		
-	  string title = input<string>("Input title : ");
-	  string body = input<string>("Input body  : ");
 
-	  app.createQuestion(currentUserId, title, body);
+      if (!isLogin) {
+        cout << "Please login first.\n";
+        break;
+      }
+
+      string title = input<string>("Input title : ");
+      string body = input<string>("Input body  : ");
+
+      app.createQuestion(currentUserId, title, body);
       break;
     }
     case '0': {
