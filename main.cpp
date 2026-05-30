@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <unordered_map>
 using namespace std;
 
 template <typename T> T input(string text);
@@ -230,7 +231,7 @@ struct App {
     }
     cout << "\nAll Questions\n";
     for (int i = 0; i < questions.length; i++) {
-      cout << i + 1 << ". " << questions.data[i].title << "\n";
+      cout << i + 1 << ". " << questions.data[i].title << " " << questions.data[i].vote << "\n";
     }
   }
 
@@ -331,6 +332,103 @@ struct App {
       }
     }
   }
+
+  void sortQuestionByVote(string mode = "ASC"){
+    int i, j, size = questions.length;
+    
+    for(i = 1; i < size; i++){
+      Question temp = questions.at(i);
+      int j = i-1;
+      if(mode == "ASC"){
+        while(j >= 0 && temp.vote < questions.data[j].vote){
+            questions.data[j + 1] = questions.data[j];
+            j--;
+        }
+      }
+      else if(mode == "DESC"){
+        while(j >= 0 && temp.vote > questions.data[j].vote){
+            questions.data[j + 1] = questions.data[j];
+            j--;
+        }
+      }
+      else{cout << "Invalid Sorting Mode." << endl; return;}
+      questions.data[j + 1] = temp;  
+    }
+  }
+
+  unordered_map<string, int> sentenceToWord(string s){
+    unordered_map<string, int> res;
+    string word = "";
+    for(char c : s){
+      c = tolower(c);
+      if(isspace(c)){
+        res[word]++;
+        word = "";
+      }
+      else{
+        word += c;
+      }
+    }  
+    if(word != ""){
+      res[word]++;
+    }   
+    return res;
+  }
+
+  Array<Question> searchTitleQuestion(string target){
+    struct SearchRes{
+        Question questions;
+        int extraWords, sameWords;
+    };
+    Array<SearchRes> searchRes;
+    unordered_map<string, int> targetWords = sentenceToWord(target);
+      for(int i = 0; i < questions.length; i++){
+        unordered_map<string, int> titleWords = sentenceToWord(questions.data[i].title);
+        SearchRes temp;
+        temp.extraWords = 0;
+        temp.sameWords = 0;
+        for(auto word1 : titleWords){
+          auto word2 = targetWords.find(word1.first);
+          if(word2 != targetWords.end()){
+            int a = word1.second, b = word2->second;
+            temp.extraWords += abs(b - a);
+            temp.sameWords += min(a, b);
+          }
+          else{
+            temp.extraWords += word1.second;
+          }
+        }
+        if(temp.sameWords > 0){
+          for(auto word : targetWords){
+            if(titleWords.find(word.first) == titleWords.end()){
+              temp.extraWords += word.second;
+            }
+          }
+          temp.questions = questions.data[i];
+          searchRes.insert(temp);
+        }
+      }
+
+    int size = searchRes.length;
+    for(int i = 1; i < size; i++){
+        SearchRes temp = searchRes.data[i];
+        int j = i-1;
+        while(j >= 0 && (temp.sameWords > searchRes.data[j].sameWords || 
+          (temp.sameWords == searchRes.data[j].sameWords && temp.extraWords < searchRes.data[j].extraWords)))
+        {
+            searchRes.data[j + 1] = searchRes.data[j];
+            j--;
+        }
+        searchRes.data[j + 1] = temp;  
+    }
+
+    Array<Question> finalRes;
+    for(int i = 0; i < size; i++){
+      finalRes.insert(searchRes.data[i].questions);
+    }
+
+    return finalRes;
+}
 
   void userInit(string path) {
     CSV csv(path);
@@ -441,79 +539,115 @@ int main() {
     switch (choice) {
     case '1': {
 
-		if (!isLogin) {
+      if (!isLogin) {
 
-		char profileChoice;
+      char profileChoice;
 
-		cout << "\n=== ACCOUNT MENU ===\n";
-		cout << "1. Register\n";
-		cout << "2. Login\n";
-		cout << "0. Back\n";
-		cout << "Choose: ";
-		cin >> profileChoice;
+      cout << "\n=== ACCOUNT MENU ===\n";
+      cout << "1. Register\n";
+      cout << "2. Login\n";
+      cout << "0. Back\n";
+      cout << "Choose: ";
+      cin >> profileChoice;
 
-		switch (profileChoice) {
+      switch (profileChoice) {
 
-			case '1': {
+        case '1': {
+            string name = input<string>("Input username : ");
+            string password = input<string>("Input password : ");
+            string email = input<string>("Input email    : ");
 
-			  string name = input<string>("Input username : ");
-			  string password = input<string>("Input password : ");
-			  string email = input<string>("Input email    : ");
+            app.createUser(name, password, email);
 
-			  app.createUser(name, password, email);
+            cout << "Register success.\n";
 
-			  cout << "Register success.\n";
+            break;
+          }
 
-			  break;
-			}
+        case '2': {
 
-			case '2': {
+          string email = input<string>("Input email    : ");
+          string password = input<string>("Input password : ");
 
-			  string email = input<string>("Input email    : ");
-			  string password = input<string>("Input password : ");
+          bool found = false;
 
-			  bool found = false;
+          for (int i = 0; i < app.users.length; i++) {
+            if (app.users.data[i].email == email &&
+              app.users.data[i].password == password) {
 
-			  for (int i = 0; i < app.users.length; i++) {
+              isLogin = true;
+              currentUserId = app.users.data[i].id;
 
-				if (app.users.data[i].email == email &&
-					app.users.data[i].password == password) {
+              found = true;
 
-				  isLogin = true;
-				  currentUserId = app.users.data[i].id;
+              cout << "Login success.\n";
+              break;
+            }
+          }
 
-				  found = true;
+          if (!found) {
+            cout << "Login failed.\n";
+          }
+          break;
+        }
 
-				  cout << "Login success.\n";
-				  break;
-				}
-			  }
+        case '0':
+          break;
 
-			if (!found) {
-				cout << "Login failed.\n";
-				}
-			break;
-			}
+        default:
+          cout << "Invalid input.\n";
+        }
 
-			case '0':
-			break;
-
-			default:
-			cout << "Invalid input.\n";
-			}
-
-		} else {
-			app.assignReputation(currentUserId);
-			app.showProfile(currentUserId);
-		  }
-
-		  break;
-			  break;
-			}
+      } 
+      else {
+        app.assignReputation(currentUserId);
+        app.showProfile(currentUserId);
+      }
+      break;
+    }
     case '2': {
       break;
     }
     case '3': {
+      char searchMenuChoice;
+      int searchChoice;
+      cout << "1. ASC" << endl;
+      cout << "2. DESC" << endl;
+      cout << "3. Title" << endl;
+      cout << "Choose: "; cin >> searchMenuChoice;
+
+      switch(searchMenuChoice){
+        case '1':{
+          app.sortQuestionByVote("ASC");
+          app.showAllQuestions();
+          searchChoice = input<int>("Choose question: ");
+          break;
+        }
+        case '2':{
+          app.sortQuestionByVote("DESC");
+          app.showAllQuestions();
+          searchChoice = input<int>("Choose question: ");
+          break;
+        }
+        case '3':{
+          string target;
+          Array<Question> res;
+          target = input<string>("enter title: ");
+          Array<Question> searchResult = app.searchTitleQuestion(target);
+          for(int i = 0; i < searchResult.length; i++){
+            cout << i + 1 << ". " << searchResult.data[i].title << endl;
+          }
+          searchChoice = input<int>("Choose question: ");
+          break;
+        }
+        case '0':{
+          break;
+        }
+        default:{
+          break;
+        }
+      }
+      cout << searchChoice;
       break;
     }
     case '4': {
