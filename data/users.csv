@@ -1,0 +1,7 @@
+id, name, email, password, reputation, votes,
+1, spongebob, spongebob@gmail.com, spongebob123, 125, 20,
+2, patrick the star, patrick@gmail.com, patrick123, 100, 20,
+3, squidward, squidward@gmail.com, squidward123, 10, 0,
+4, mr.crab, mr.crab@gmail.com, mr.crab123, 30, 0,
+5, sandy, sandy@gmail.com, sandy123, 400, 250,
+6, larry, larry@gmail.com, larry123, 100, 250,

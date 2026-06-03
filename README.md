@@ -1,7 +1,11 @@
 # Stack Overflow
 
 ## Penjelasan Logika Fitur
+<<<<<<< HEAD
 test
+=======
+
+>>>>>>> 8010e344f3bcdd9e5a431217663c3bdab8e36502
 1. **Guest vs Member :**
 
 - User yang belum login dianggap sebagai **Guest** dan yang sudah login dianggap sebagai **Member**.
@@ -20,13 +24,6 @@ test
 
 ## Menu
 
-### Menu untuk Guest
-
-1. Show newest questions
-2. Search questions
-
-### Menu untuk Member
-
 1. Show profile
 2. Show newest questions
 3. Search questions
@@ -43,14 +40,14 @@ MENU/
 │ │ ├── 🔑 Login
 │ │ └── 🔙 Back to Main Menu
 │ └── 🔓 If Member (Logged In)
-│ ├── 📊 View Stats (Username, Reputasi, Badge)
+│ ├── 📊 View Stats (Username, Reputasi)
 │ ├── 📚 My Questions (List pertanyaan sendiri)
 │ ├── 📜 My Answers (List jawaban sendiri)
 │ └── 🔙 Back to Main Menu
 │
 ├── 🆕 2. Show Newest Questions
 │ ├── 📄 List: [Title] | [Votes] | [Answers] | [Is Verified?]
-│ └── 🔍 Select Question (ID)
+│ └── 🔍 Select Question (No)
 │ └── 📖 [Question Detail View]
 │ ├── 💬 View Comments
 │ ├── 💡 View Answers (List jawaban + Status Verifikasi)
@@ -61,11 +58,6 @@ MENU/
 │ └── 🗳️ Vote Answer (Up/Down)
 │
 ├── 🔍 3. Search Questions
-│ ├── ⌨️ Enter Keyword
-│ ├── ⚙️ Set Filters (Optional)
-│ │ ├── 🔢 Min Votes Count (e.g., > 10)
-│ │ ├── ❓ Answer Status (All / Answered / Unanswered)
-│ │ └── ✅ Verification Status (Verified / Not Verified)
 │ ├── 📑 Set Sorting
 │ │ ├── ⬆️ Vote (ASC)
 │ │ └── ⬇️ Vote (DESC)
@@ -81,7 +73,6 @@ MENU/
 │ └── 🔓 If Member
 │ ├── ⌨️ Input Title
 │ ├── ⌨️ Input Content/Body
-│ ├── ⌨️ Input Tags
 │ └── ✅ Submit Question
 │
 └── 🚪 5. Exit (Keluar Aplikasi)
@@ -89,7 +80,7 @@ MENU/
 
 ## Cara Pake Function dan Struct
 
-Untuk setiap input jangan pake `cin << input` ya ges, tapi pake ini
+Untuk setiap input jangan pake `cin << input` (kecuali tipe data char) ya ges, tapi pake ini
 
 > [!NOTE]
 > untuk input string, bisa pake enter, untuk berhentiinnya pake tab
@@ -98,11 +89,8 @@ Untuk setiap input jangan pake `cin << input` ya ges, tapi pake ini
 nama-variable = <tipe-data>input(string text)
 
 // contoh
-int umur = <string>input("masukkan umur: ");
-string text = <string>input("masukkan text: "); // untuk string bisa input enter
-// misal, input = "UPN
-// Veteran
-// Jogja" untuk berhentiinnya pake tab lalu enter.
+int umur = input<int>("masukkan umur: ");
+string text = input<string>("masukkan text: ");
 ```
 
 ```c
@@ -123,11 +111,13 @@ app.createUser(<nama>, <password>, <email>) // Membuat user baru
 
 app.createQuestion(int userId, string title, string body, Array<string> tags) // Membuat pertanyaan berdasarkan user ID.
 
+app.showAnswer(int questionId) //tampilin answer berdasarkan question id
+
+app.showComment(int questionId) //tampilin comment berdasarkan question id
+
 app.voteUp(<struct Question/Answer>, <userId>) // Vote pertnyaan atau jawaban berdasarkan user ID.
 
 app.voteDown(<struct Question/Answer>, <userId>) // vote down pertanyaan atau jawaban berdasarkan user ID.
-
-app.assignBadges(<userId>) // Memberikan badges berdasarkan user ID (jenis badges ditentukan otomatis oleh function).
 
 app.assignReputation(<userId>) // Memberikan reputasi berdasarkan user ID.
 
