@@ -1,4 +1,4 @@
-id, authorId, text, vote,
-1, 3, pointers don't know how much memory they point to., 0,
-2, 5, The -> is just shorthand for (*ptr).. It makes code much cleaner, 1,
-3, 5, Recursion is like a mirror facing another mirror. Without a base case it goes on for infinity (or until your RAM gives up)., 2,
+id,authorId,text
+1,3,pointers don't know how much memory they point to.
+2,5,The -> is just shorthand for (*ptr).. It makes code much cleaner
+3,5,Recursion is like a mirror facing another mirror. Without a base case it goes on for infinity (or until your RAM gives up).

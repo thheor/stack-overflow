@@ -1,6 +1,0 @@
-name:linus
-password:linus123
-email:linus@gmail.com
-question:
-  string title: How to make an array of numbers into one single number?
-  string body: I have an array (or vector) of integers, and I want to turn them into a single number. For example: If the array contains single-digit numbers: {1, 2, 3, 4}, I want 1234. If the array contains multi-digit numbers: {12, 34, 5}, I want 12345. How can I do this?
