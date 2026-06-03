@@ -281,6 +281,9 @@ struct App {
     Question &question = questions.data[questionId - 1];
 
     cout << "\n--- Comment ---\n";
+    if(question.comments.length == 0){
+      cout << "No comments yet." << endl;
+    }
     for (int i = 0; i < question.comments.length; i++) {
       cout << questions.data[questionId - 1].comments.at(i).text << endl;
     }
@@ -377,8 +380,6 @@ struct App {
     }
 }
 
-
-
   void showQuestionDetail(int index) {
 
       Question &q = questions.data[index];
@@ -429,8 +430,8 @@ struct App {
         cout << "Verified";
       else
         cout << "Not Verified"; 
-      cout << endl;
-      cout << a.text << endl;
+        cout << endl;
+        cout << a.text << endl;
     }
   }
 
@@ -855,7 +856,7 @@ int main() {
         if(realIndex < 0 ||realIndex >= app.questions.length)
         {
           cout << "Invalid Question.\n";
-          enterToContinue();
+          cin.ignore(); enterToContinue();
           break;
         }
 
@@ -896,17 +897,23 @@ int main() {
           }
         }
 
-        if(searchResult.length == 0){
-          cout << "No question found." << endl; 
-          enterToContinue();
-          break;
-        }
-
+        
         if(validInput){
+          if(searchResult.length == 0){
+            cout << "No question found." << endl; 
+            enterToContinue();
+            break;
+          }
+
           for(int i = 0; i < searchResult.length; i++){
             cout << i + 1 << ". " << searchResult.data[i]->title << endl;
           }
           searchChoice = input<int>("Choose question: ");
+          if(searchChoice > searchResult.length){
+            cout << "Input out of range." << endl;
+            cin.ignore(); enterToContinue();
+            break;
+          }
     
           int realIndex = searchResult.data[searchChoice - 1] - app.questions.data;
           clearScreen();
