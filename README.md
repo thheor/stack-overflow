@@ -1,11 +1,7 @@
 # Stack Overflow
 
 ## Penjelasan Logika Fitur
-<<<<<<< HEAD
-test
-=======
 
->>>>>>> 8010e344f3bcdd9e5a431217663c3bdab8e36502
 1. **Guest vs Member :**
 
 - User yang belum login dianggap sebagai **Guest** dan yang sudah login dianggap sebagai **Member**.
