@@ -855,6 +855,7 @@ int main() {
         if(realIndex < 0 ||realIndex >= app.questions.length)
         {
           cout << "Invalid Question.\n";
+          enterToContinue();
           break;
         }
 
@@ -874,11 +875,11 @@ int main() {
         bool validInput = true;
         switch(searchMenuChoice){
           case '1':{
-            searchResult = app.sortQuestionByVote("ASC");
+            searchResult = app.sortQuestionByVote("DESC");
             break;
           }
           case '2':{
-            searchResult = app.sortQuestionByVote("DESC");
+            searchResult = app.sortQuestionByVote("ASC");
             break;
           }
           case '3':{
