@@ -194,6 +194,20 @@ struct User {
   int reputation = 0;
 };
 
+void clearScreen() {
+  #ifdef _WIN32
+      system("cls");
+  #else
+      system("clear");
+  #endif
+}
+
+void enterToContinue(){
+  cout << "\npress enter to continue..." << endl;
+  string temp;
+  getline(cin, temp);
+}
+
 struct App {
   Array<User> users;
   Array<Question> questions;
@@ -365,68 +379,62 @@ struct App {
 
 
 
-void showQuestionDetail(int index) {
+  void showQuestionDetail(int index) {
 
-    Question &q = questions.data[index];
+      Question &q = questions.data[index];
 
-    cout << "\n=========================\n";
-    cout << "Title    : " << q.title << endl;
-    cout << "Vote     : " << q.vote << endl;
+      cout << "\n=========================\n";
+      cout << "Title    : " << q.title << endl;
+      cout << "Vote     : " << q.vote << endl;
 
-    cout << "Verified : ";
+      cout << "Verified : ";
 
-    if(q.isVerified)
-        cout << "Yes";
-    else
-        cout << "No";
+      if(q.isVerified)
+          cout << "Yes";
+      else
+          cout << "No";
 
-    cout << endl;
+      cout << endl;
 
-    cout << "\nBody:\n";
-    cout << q.body << endl;
+      cout << "\nBody:\n";
+      cout << q.body << endl;
 
-    cout << "=========================\n";
-}
+      cout << "=========================\n";
+  }
 
-void showAnswerList(int questionId){
+  void showAnswerList(int questionId){
 
     Question &q = questions.data[questionId - 1];
 
     cout << "\n=== ANSWERS ===\n";
 
     if(q.answers.length == 0){
-        cout << "No answers yet.\n";
-        return;
+      cout << "No answers yet.\n";
+      return;
     }
 
     for(int i=0;i<q.answers.length;i++){
 
-        Answer &a = q.answers.data[i];
+      Answer &a = q.answers.data[i];
 
-        cout << "\nAnswer #" << i+1 << endl;
+      cout << "\nAnswer #" << i+1 << endl;
 
-        cout << "Author : "
-             << users.data[a.authorId - 1].name
-             << endl;
+      cout << "Author : " << users.data[a.authorId - 1].name << endl;
 
-        cout << "Vote   : "
-             << a.vote
-             << endl;
+      cout << "Vote   : " << a.vote << endl;
 
-        cout << "Status : ";
+      cout << "Status : ";
 
-        if(a.isAccepted)
-            cout << "Verified";
-        else
-            cout << "Not Verified";
-
-        cout << endl;
-
-        cout << a.text << endl;
+      if(a.isAccepted)
+        cout << "Verified";
+      else
+        cout << "Not Verified"; 
+      cout << endl;
+      cout << a.text << endl;
     }
-}
+  }
 
-void questionActions(int questionIndex, int currentUserId){
+  void questionActions(int questionIndex, int currentUserId){
 
     Question &q = questions.data[questionIndex];
 
@@ -444,122 +452,151 @@ void questionActions(int questionIndex, int currentUserId){
     cin >> actionChoice;
 
     switch(actionChoice){
+      case '1':
+        voteUp(currentUserId,q);
+        cin.ignore();
+        break;
 
-        case '1':
-            voteUp(currentUserId,q);
-            break;
+      case '2':
+        voteDown(currentUserId,q);
+        cin.ignore();
+        break;
+        
+      case '3':{
+        string comment = input<string>("Comment: ");
+        q.addComment(currentUserId, comment, false);
+        break;
+      }
 
-        case '2':
-            voteDown(currentUserId,q);
-            break;
+      case '4':{
+        string answer = input<string>("Answer: ");
+        q.addAnswer(currentUserId, answer, false);
+        break;
+      }
 
-        case '3':{
-
-            string comment =
-                input<string>("Comment: ");
-
-            q.addComment(
-                currentUserId,
-                comment,
-                false
-            );
-
-            break;
+      case '5':{
+        if(q.answers.length == 0){
+          cout << "No answers available.\n";
+          cin.ignore();
+          break;
         }
 
-        case '4':{
-
-            string answer =
-                input<string>("Answer: ");
-
-            q.addAnswer(
-                currentUserId,
-                answer,
-                false
-            );
-
-            break;
+        for(int i=0;i<q.answers.length;i++){
+          cout << i+1 << ". " << q.answers.data[i].text << endl;
         }
 
-        case '5':{
-
-            if(q.answers.length == 0){
-
-                cout << "No answers available.\n";
-                break;
-            }
-
-            for(int i=0;i<q.answers.length;i++){
-
-                cout << i+1
-                     << ". "
-                     << q.answers.data[i].text
-                     << endl;
-            }
-
-            int answerChoice =
-                input<int>("Choose answer: ");
-
-            if(answerChoice < 1 ||
-               answerChoice > q.answers.length){
-
-                cout << "Invalid answer.\n";
-                break;
-            }
-
-            cout << "1. Vote Up\n";
-            cout << "2. Vote Down\n";
-
-            int voteChoice =
-                input<int>("Choose: ");
-
-            if(voteChoice == 1){
-
-                voteUp(
-                    currentUserId,
-                    q.answers.data[answerChoice-1]
-                );
-            }
-            else if(voteChoice == 2){
-
-                voteDown(
-                    currentUserId,
-                    q.answers.data[answerChoice-1]
-                );
-            }
-
-            break;
+        int answerChoice = input<int>("Choose answer: ");
+        if(answerChoice < 1 || answerChoice > q.answers.length){
+          cout << "Invalid answer.\n";
+          cin.ignore();
+          break;
         }
 
-        case '0':
-            break;
+        cout << "1. Vote Up\n";
+        cout << "2. Vote Down\n";
+        int voteChoice = input<int>("Choose: ");
 
-        default:
-            cout << "Invalid action.\n";
+        if(voteChoice == 1){
+          voteUp(currentUserId, q.answers.data[answerChoice-1]);
+        }
+
+        else if(voteChoice == 2){
+          voteDown(currentUserId, q.answers.data[answerChoice-1]);
+        }
+
+        else{cout << "Invalid input." << endl; cin.ignore();}
+
+        break;
+      }
+
+      case '0':
+        break;
+
+      default:
+        cout << "Invalid action.\n";
+        cin.ignore();
     }
-}
+    enterToContinue();
+  }
 
-  void sortQuestionByVote(string mode = "ASC"){
+  void showQuestionDetailMenu(int& realIndex, int& currentUserId, bool& isLogin){
+
+    char detailChoice;
+    do{
+      clearScreen();
+      showQuestionDetail(realIndex);
+      cout << "\n1. View Comments\n";
+      cout << "2. View Answers\n";
+      cout << "3. Actions\n";
+      cout << "0. Back\n";
+      cout << "Choose: "; cin >> detailChoice;
+
+      if(cin.peek() != '\n'){
+        cin.ignore(1000, '\n');
+        cout <<"press enter to continue." << endl;
+        string enter; getline(cin, enter);
+      }
+
+      switch(detailChoice){
+        case '1':
+          clearScreen();
+          showComment(realIndex + 1);
+          cin.ignore(); enterToContinue();
+          break;
+  
+        case '2':
+          clearScreen();
+          showAnswerList(realIndex + 1);
+          cin.ignore(); enterToContinue();
+          break;
+  
+        case '3':
+          if(!isLogin){
+            clearScreen();
+            cout << "====================\n";
+            cout << " Please login first \n";
+            cout << "====================\n";
+            cin.ignore(); enterToContinue();
+           }
+          else{
+            questionActions(realIndex, currentUserId);
+          }
+          break;
+  
+        case '0':{
+            break;
+          }
+        default:
+          cout << "Invalid input.\n";
+          cin.ignore(); enterToContinue();
+      }
+    }while(detailChoice != '0');
+  }
+
+  Array<Question*> sortQuestionByVote(string mode = "ASC"){
+    Array<Question*> res;
     int i, j, size = questions.length;
     
+    res.insert(&questions.data[0]);
     for(i = 1; i < size; i++){
-      Question temp = questions.at(i);
+      res.insert(&questions.data[i]);
+      Question* temp = res.data[i];
       int j = i-1;
-      if(mode == "ASC"){
-        while(j >= 0 && temp.vote < questions.data[j].vote){
-            questions.data[j + 1] = questions.data[j];
+      if(mode == "DESC"){
+        while(j >= 0 && temp->vote > res.data[j]->vote){
+            res.data[j + 1] = res.data[j];
             j--;
         }
       }
-      else if(mode == "DESC"){
-        while(j >= 0 && temp.vote > questions.data[j].vote){
-            questions.data[j + 1] = questions.data[j];
+      else{
+        while(j >= 0 && temp->vote < res.data[j]->vote){
+            res.data[j + 1] = res.data[j];
             j--;
         }
       }
-      else{cout << "Invalid Sorting Mode." << endl; return;}
-      questions.data[j + 1] = temp;  
+      res.data[j + 1] = temp;  
     }
+    return res;
   }
 
   unordered_map<string, int> sentenceToWord(string s){
@@ -581,9 +618,9 @@ void questionActions(int questionIndex, int currentUserId){
     return res;
   }
 
-  Array<Question> searchTitleQuestion(string target){
+  Array<Question*> searchTitleQuestion(string target){
     struct SearchRes{
-        Question questions;
+        Question* questions;
         int extraWords, sameWords;
     };
     Array<SearchRes> searchRes;
@@ -610,7 +647,7 @@ void questionActions(int questionIndex, int currentUserId){
               temp.extraWords += word.second;
             }
           }
-          temp.questions = questions.data[i];
+          temp.questions = &questions.data[i];
           searchRes.insert(temp);
         }
       }
@@ -628,7 +665,7 @@ void questionActions(int questionIndex, int currentUserId){
         searchRes.data[j + 1] = temp;  
     }
 
-    Array<Question> finalRes;
+    Array<Question*> finalRes;
     for(int i = 0; i < size; i++){
       finalRes.insert(searchRes.data[i].questions);
     }
@@ -719,14 +756,6 @@ public:
   }
 };
 
-void clearScreen() {
-  #ifdef _WIN32
-      system("cls");
-  #else
-      system("clear");
-  #endif
-  }
-
 int main() {
   App app;
   app.init();
@@ -737,10 +766,10 @@ int main() {
   char choice;
   bool isMenu = true;
 
-  cout << "Welcome to Stack Overflow!\n";
-
+  
   while (isMenu) {
-
+    clearScreen();
+    cout << "Welcome to Stack Overflow!\n";
     cout << "\n==== MENU ====\n";
     cout << "1. Show profile\n";
     cout << "2. Show newest questions\n";
@@ -749,236 +778,165 @@ int main() {
     cout << "0. Exit\n";
     cout << "Choose: ";
     cin >> choice;
-
+    
     switch (choice) {
-    case '1': {
 
-      if (!isLogin) {
+      case '1': {
+        if (!isLogin) {
 
-      char profileChoice;
+          char profileChoice;
 
-      cout << "\n=== ACCOUNT MENU ===\n";
-      cout << "1. Register\n";
-      cout << "2. Login\n";
-      cout << "0. Back\n";
-      cout << "Choose: ";
-      cin >> profileChoice;
+          cout << "\n=== ACCOUNT MENU ===\n";
+          cout << "1. Register\n";
+          cout << "2. Login\n";
+          cout << "0. Back\n";
+          cout << "Choose: ";
+          cin >> profileChoice;
 
-      switch (profileChoice) {
+          switch (profileChoice) {
+            case '1': {
+              string name = input<string>("Input username : ");
+              string password = input<string>("Input password : ");
+              string email = input<string>("Input email    : ");
 
-        case '1': {
-            string name = input<string>("Input username : ");
-            string password = input<string>("Input password : ");
-            string email = input<string>("Input email    : ");
+              app.createUser(name, password, email);
 
-            app.createUser(name, password, email);
-
-            cout << "Register success.\n";
-
-            break;
-          }
-
-        case '2': {
-
-          string email = input<string>("Input email    : ");
-          string password = input<string>("Input password : ");
-
-          bool found = false;
-
-          for (int i = 0; i < app.users.length; i++) {
-            if (app.users.data[i].email == email &&
-              app.users.data[i].password == password) {
-
-              isLogin = true;
-              currentUserId = app.users.data[i].id;
-
-              found = true;
-
-              cout << "Login success.\n";
+              cout << "Register success.\n";
               break;
             }
-          }
 
-          if (!found) {
-            cout << "Login failed.\n";
-          }
-          break;
-        }
+            case '2': {
+              string email = input<string>("Input email    : ");
+              string password = input<string>("Input password : ");
+              bool found = false;
 
-        case '0':
-          break;
+              for (int i = 0; i < app.users.length; i++) {
+                if (app.users.data[i].email == email &&
+                  app.users.data[i].password == password) {
 
-        default:
-          cout << "Invalid input.\n";
-        }
+                  isLogin = true;
+                  currentUserId = app.users.data[i].id;
 
-      } 
-      else {
-        app.assignReputation(currentUserId);
-        app.showProfile(currentUserId);
-      }
-      break;
-    }
-    case '2': {
+                  found = true;
 
-       app.showNewestQuestions();
-
-    int questionChoice =
-        input<int>("Select Question: ");
-
-    int realIndex =
-        app.questions.length - questionChoice;
-
-    if(realIndex < 0 ||
-       realIndex >= app.questions.length)
-    {
-        cout << "Invalid Question.\n";
-        break;
-    }
-
-    bool isDetail = true;
-
-    while(isDetail){
-
-        clearScreen();
-
-        app.showQuestionDetail(realIndex);
-
-        cout << "\n1. View Comments\n";
-        cout << "2. View Answers\n";
-        cout << "3. Actions\n";
-        cout << "0. Back\n";
-
-        char detailChoice;
-
-        cout << "Choose: ";
-        cin >> detailChoice;
-
-        switch(detailChoice){
-
-            case '1':
-
-                  clearScreen();
-
-                app.showComment(realIndex + 1);
-
-                cout << "\nPress Enter to continue...";
-                cin.ignore();
-                cin.get();
-
-                break;
-2
-            case '2':
-
-               clearScreen();
-
-                app.showAnswerList(realIndex + 1);
-
-                cout << "\nPress Enter to continue...";
-                cin.ignore();
-                cin.get();
-
-                break;
-
-            case '3':
-
-                if(!isLogin){
-
-                    clearScreen();
-
-                      cout << "====================\n";
-                      cout << " Please login first \n";
-                      cout << "====================\n";
-
-                      cout << "\nPress Enter...";
-                      cin.ignore();
-                      cin.get();
+                  cout << "Login success.\n";
+                  enterToContinue();
+                  break;
                 }
-                else{
+              }
 
-                    app.questionActions(
-                        realIndex,
-                        currentUserId
-                    );
-                }
-
-                break;
+              if (!found) {
+                cout << "Login failed.\n";
+                enterToContinue();
+              }
+              break;
+            }
 
             case '0':
-
-                isDetail = false;
-
-                break;
+              break;
 
             default:
+              cout << "Invalid input.\n";
+          }
+        } 
 
-                cout << "Invalid input.\n";
+        else {
+          app.assignReputation(currentUserId);
+          app.showProfile(currentUserId);
+          cin.ignore(); enterToContinue();
         }
+      break;
     }
-    break;
-  }
-    case '3': {
-      char searchMenuChoice;
-      int searchChoice;
-      cout << "1. ASC" << endl;
-      cout << "2. DESC" << endl;
-      cout << "3. Title" << endl;
-      cout << "Choose: "; cin >> searchMenuChoice;
+      case '2': {
+        app.showNewestQuestions();
+        int questionChoice = input<int>("Select Question: ");
+        int realIndex = app.questions.length - questionChoice;
 
-      switch(searchMenuChoice){
-        case '1':{
-          app.sortQuestionByVote("ASC");
-          app.showAllQuestions();
-          searchChoice = input<int>("Choose question: ");
+        if(realIndex < 0 ||realIndex >= app.questions.length)
+        {
+          cout << "Invalid Question.\n";
           break;
         }
-        case '2':{
-          app.sortQuestionByVote("DESC");
-          app.showAllQuestions();
-          searchChoice = input<int>("Choose question: ");
+
+        clearScreen();
+        app.showQuestionDetailMenu(realIndex, currentUserId, isLogin);
+        break;
+      }
+      case '3': {
+        char searchMenuChoice;
+        int searchChoice;
+        cout << "1. Most Voted Question" << endl;
+        cout << "2. Least Voted Question" << endl;
+        cout << "3. Search By Title" << endl;
+        cout << "Choose: "; cin >> searchMenuChoice;
+        Array<Question*> searchResult;
+
+        bool validInput = true;
+        switch(searchMenuChoice){
+          case '1':{
+            searchResult = app.sortQuestionByVote("ASC");
+            break;
+          }
+          case '2':{
+            searchResult = app.sortQuestionByVote("DESC");
+            break;
+          }
+          case '3':{
+            string target;
+            target = input<string>("enter title: ");
+            searchResult = app.searchTitleQuestion(target);
+            break;
+          }
+          default:{
+            cout <<  "invalid input" << endl;
+            cin.ignore(); enterToContinue();
+            validInput = false;
+            break;
+          }
+        }
+
+        if(searchResult.length == 0){
+          cout << "No question found." << endl; 
+          enterToContinue();
           break;
         }
-        case '3':{
-          string target;
-          Array<Question> res;
-          target = input<string>("enter title: ");
-          Array<Question> searchResult = app.searchTitleQuestion(target);
+
+        if(validInput){
           for(int i = 0; i < searchResult.length; i++){
-            cout << i + 1 << ". " << searchResult.data[i].title << endl;
+            cout << i + 1 << ". " << searchResult.data[i]->title << endl;
           }
           searchChoice = input<int>("Choose question: ");
-          break;
+    
+          int realIndex = searchResult.data[searchChoice - 1] - app.questions.data;
+          clearScreen();
+          app.showQuestionDetailMenu(realIndex, currentUserId, isLogin);
         }
-        case '0':{
-          break;
-        }
-        default:{
-          break;
-        }
+        break;
       }
-      cout << searchChoice;
-      break;
-    }
-    case '4': {
-		
-		if (!isLogin) {
-			cout << "Please login first.\n";
-			break;
-		}
-		
-	  string title = input<string>("Input title : ");
-	  string body = input<string>("Input body  : ");
+      case '4': {
+        if (!isLogin) {
+          cout << "Please login first.\n";
+          enterToContinue();
+          break;
+        }
+      
+        string title = input<string>("Input title : ");
+        string body = input<string>("Input body  : ");
 
-	  app.createQuestion(currentUserId, title, body);
-      break;
-    }
-    case '0': {
-      isMenu = false;
-      break;
-    }
-    default:
-      cout << "Invalid input.\n";
-      break;
+        app.createQuestion(currentUserId, title, body);
+        cout << "Question created." << endl;
+        enterToContinue();
+        break;
+      }
+      case '0': {
+        isMenu = false;
+        break;
+      }
+      default:{
+        cout << "Invalid input.\n";
+        cin.ignore(); enterToContinue();
+        break;
+      }
     }
   }
   return 0;
