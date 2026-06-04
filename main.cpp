@@ -277,6 +277,7 @@ Array<string> questionToCsvline(Array<Question> arr) {
 
 Array<string> answerToCsvline(Array<Answer> arr) {
   Array<string> res;
+  res.insert("id,authorId,text,vote,isAccepted");
   for (int i = 0; i < arr.length; i++) {
     string line = "";
     line += to_string(arr.data[i].id) + ",";
@@ -327,18 +328,19 @@ struct App {
                       .isVerified = 0};
 
     questions.insert(input);
-
-    if (!isInit) {
-      cout << "Question created successfully.\n";
-      Array<string> arr;
-      arr.insert(to_string(id));
-      arr.insert(to_string(userId));
-      arr.insert(title);
-      arr.insert(body);
-      arr.insert(to_string(0));
-      arr.insert(to_string(0));
-      csvQuestions.append(arr);
+    if (isInit) {
+      return;
     }
+
+    cout << "Question created successfully.\n";
+    Array<string> arr;
+    arr.insert(to_string(id));
+    arr.insert(to_string(userId));
+    arr.insert(title);
+    arr.insert(body);
+    arr.insert(to_string(0));
+    arr.insert(to_string(0));
+    csvQuestions.append(arr);
   }
 
   void showAllQuestions() {
@@ -379,7 +381,7 @@ struct App {
 
     Array<Answer> answers = getAllAnswer();
     Array<string> arr = answerToCsvline(answers);
-    csvQuestions.write(arr);
+    csvAnswers.write(arr);
     cout << "Vote down successfully.";
   }
 
@@ -388,7 +390,7 @@ struct App {
 
     Array<Answer> answers = getAllAnswer();
     Array<string> arr = answerToCsvline(answers);
-    csvQuestions.write(arr);
+    csvAnswers.write(arr);
     cout << "Vote up successfully.";
   }
 
@@ -416,6 +418,13 @@ struct App {
       cout << "No comments yet." << endl;
     }
     for (int i = 0; i < question.comments.length; i++) {
+      int authorId = questions.data[questionId - 1].comments.at(i).authorId;
+      for (int i = 0; i < users.length; i++) {
+        if (users.data[i].id == authorId) {
+          string author = users.data[authorId - 1].name;
+          cout << "Author: " << author << endl;
+        }
+      }
       cout << questions.data[questionId - 1].comments.at(i).text << endl;
     }
     cout << "\n";
@@ -1058,7 +1067,6 @@ int main() {
       string body = inputStr("Input body  : ");
 
       app.createQuestion(currentUserId, title, body);
-      cout << "Question created." << endl;
       enterToContinue();
       break;
     }
